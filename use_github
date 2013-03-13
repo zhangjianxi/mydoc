@@ -17,3 +17,6 @@ git push name(别名) master
 
 #将github上的代码下载到本地，附加分支信息
 git pull name(别名) master
+
+#克隆代码
+git clone git@github.com:zhangjianxi/xxx.git master
