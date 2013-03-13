@@ -1,0 +1,19 @@
+# 创建一个版本库
+git init
+# 每次修改好了后，可以先将修改存入stage(快照/索引)中
+git add <modified files>
+# 修改了大量文件则使用下面这个命令批量存入
+git add .
+# 使用commit将快照/索引中的内容提交到版本库中
+git commit -m "msg"
+# 也可以将git add与git commit用一个指令完成
+git commit -a -m "msg"
+
+#创建节点
+git remote add name(别名) https://github.com/zhangjianxi/xxx.git
+
+#将本地的代码上传到github，创建master分支
+git push name(别名) master
+
+#将github上的代码下载到本地，附加分支信息
+git pull name(别名) master
