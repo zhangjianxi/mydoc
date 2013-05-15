@@ -1,0 +1,99 @@
+VIM7.3设置（for Windows）  2012-05-19 21:09:00|  分类： VIM |  标签：vim   |字号大
+中
+小 订阅 
+GVIM乱码问题的解决
+
+Vim有四个跟字符编码方式有关的选项，分别是：encoding、fileencoding、fileencodings、 termencoding (这些选项可能的取值请参考 Vim 在线帮助 :help encoding-names)，它们各自的意义:
+      * encoding: Vim 内部使用的字符编码方式，包括 Vim 的 buffer (缓冲区)、菜单文本、消息文本等。用户手册上建议只在 .vimrc 中改变它的值，事实上似乎也只有在 .vimrc 中改变它的值才有意义。
+      * fileencoding: Vim 中当前编辑的文件的字符编码方式，Vim 保存文件时也会将文件保存为这种字符编码方式 (不管是否新文件都如此)。
+      * fileencodings: Vim 启动时会按照它所列出的字符编码方式逐一探测即将打开的文件的字符编码方式，并且将 fileencoding 设置为最终探测到的字符编码方式。因此最好将 Unicode 编码方式放到这个列表的最前面，将拉丁语系编码方式 latin1 放到最后面。
+      * termencoding: Vim 所工作的终端 (或者 Windows 的 Console 窗口) 的字符编码方式。这个选项在 Windows 下对我们常用的 GUI 模式的 gVim 无效，而对 Console 模式的 Vim 而言就是 Windows 控制台的代码页，并且通常我们不需要改变它。
+      由于 Unicode 能够包含几乎所有的语言的字符，Unicode的 UTF-8 编码方式又是非常具有性价比的编码方式，因此encoding 的值设置为utf-8。同时将encoding设置为utf-8时，Vim自动探测文件的编码方式会更准确。在中文 Windows里编辑的文件，为了兼顾与其他软件的兼容性，文件编码还是设置为GB2312/GBK比较合适，因此fileencoding建议设置为 chinese (chinese 是个别名，在Unix里表示gb2312，在Windows里表示cp936，也就是GBK的代码页)。
+      最终对于文件中显示乱码、菜单乱码、右键菜单乱码以及Conlse输出乱码问题的解决方案，修改Vim编辑器所对应的配置文件_vimrc，添加如下配置：
+
+"关闭上侧工具栏
+set go-=T
+"关闭右侧滚动条
+"set go-=r
+
+"总是显示标签。0：不显示；1：多于1个时显示
+set showtabline=2
+
+"开启行号
+set number
+"开启自动缩进, 7.3以上版本已自动开启
+"set autoindent
+"缩进宽度为4个字符
+set shiftwidth=4
+"tab宽度为4个字符
+set tabstop=4
+"编辑时将所有tab替换为空格
+set et
+"按一次Backspace就删除4个空格
+set smarttab
+"配色方案
+colo desert
+"开启语法高亮, 7.3版本已自动开启
+"syntax on
+"字体设置
+set guifont=courier_new:h10
+"关闭兼容模式
+set nocompatible
+"以下三行模拟Windows操作，如Ctrl-C复制
+source $VIMRUNTIME/vimrc_example.vim
+source $VIMRUNTIME/mswin.vim
+behave mswin
+"不生成备份文件，下面这句要写在behave mswin下面，否则还是会生成备份，不知为何～
+set nobackup
+"GVIM内部编码
+set encoding=utf-8
+"当前编辑的文件编码
+set fileencoding=utf-8
+"GVIM支持打开的文件编码
+set fileencodings=utf-8,gbk,gb2312,big5,latin1
+"解决菜单及右键菜单乱码
+source $VIMRUNTIME/delmenu.vim
+source $VIMRUNTIME/menu.vim
+"解决consle输出乱码
+language messages zh_CN.utf-8
+"设置Linux终端为GVIM内部编码，Windows下可不设置
+let &termencoding=&encoding
+"防止特殊符号无法正常显示，如五角星等
+set ambiwidth=double
+
+set diffexpr=MyDiff()
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let eq = ''
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      let cmd = '""' . $VIMRUNTIME . '\diff"'
+      let eq = '"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
+
+endfunction
+
+
+
+
+"自动补全，7.3版本已自动开启
+autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
+autocmd FileType css set omnifunc=csscomplete#CompleteCSS
+autocmd FileType xml set omnifunc=xmlcomplete#CompleteTags
+autocmd FileType php set omnifunc=phpcomplete#CompletePHP
+autocmd FileType c set omnifunc=ccomplete#Complete
