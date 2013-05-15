@@ -1,0 +1,18 @@
+在cygwin虚拟机中可以使用ls命令等linux下的一些命令，如果在win下将环境变量path中添加x:\cygwin\bin（x:指的是cygwin所在的盘符），可以在cmd环境中使用这些命令，而不用一定要在bash环境下使用比如ls，gcc，df，ps，kill等命令，从而实现cmd下的linux shell编程，然而ls命令在cmd下显示中文出现乱码，在cygwin中通过修改参数可以使其支持中文显示，在cmd中可以使用doskey命令创建宏，命令为
+
+doskey ls=ls --show-control-chars --color
+
+然而如果每次启动cmd，都要设定的话，就让人难以忍受了，通过查看cmd的帮助，得到以下有用信息：
+
+如果 /D 未在命令行上被指定，当 CMD.EXE 开始时，它会寻找以下 REG_SZ/REG_EXPAND_SZ 注册表变量。如果其中一个或两个都存在，这两个变量会先被执行。
+
+    HKEY_LOCAL_MACHINE\Software\Microsoft\Command Processor\AutoRun
+
+        和/或
+
+    HKEY_CURRENT_USER\Software\Microsoft\Command Processor\AutoRun
+
+命令扩展是按默认值启用的。
+
+于是就可以将doskey ls=ls --show-control-chars --color这条命令添加到HKEY_LOCAL_MACHINE\Software\Microsoft\Command Processor\AutoRun这个键值中，不但使其支持中文显示，而且还会颜色标示。呵呵，试试吧！
+
